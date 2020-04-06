@@ -20,15 +20,12 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     private int sz = 0;
 
     private Item[] items;
-    private int[] indices;
+    // private int[] indices;
     private int currentIndex = 0;
 
     // construct an empty randomized queue
     public RandomizedQueue() {
         this.items = (Item[]) new Object[this.capacity];
-        this.indices = new int[this.capacity];
-        for (int i = 0; i < this.capacity; i++)
-            indices[i] = i;
     }
 
     // is the randomized queue empty?
@@ -45,15 +42,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     public void enqueue(Item item) {
         if (item == null) throw new IllegalArgumentException();
 
-        this.items[this.currentIndex + this.sz++] = item;
-        if (this.size() + this.currentIndex == this.capacity) {
-            if (this.capacity > 10 && this.size() < this.capacity / 4)
-                this.resize(this.capacity / 4);
-            else if (this.size() > this.capacity / 2) {
-                this.resize(this.capacity * 2);
-            }
-            else
-                this.resize(this.capacity);
+        this.items[(this.currentIndex + this.size()) % this.capacity] = item;
+        this.sz++;
+        if (this.size() == this.capacity) {
+            this.resize(this.capacity * 2);
         }
 
     }
@@ -61,14 +53,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     private void resize(int newSize) {
         Item[] newItems = (Item[]) new Object[newSize];
         for (int i = this.currentIndex, j = 0; i < this.currentIndex + this.size(); i++, j++) {
-            newItems[j] = this.items[i];
+            newItems[j] = this.items[i % this.capacity];
         }
-        int[] newIndices = new int[newSize];
-        for (int i = 0; i < newSize; i++)
-            newIndices[i] = i;
 
         this.items = newItems;
-        this.indices = newIndices;
         this.capacity = newSize;
         this.currentIndex = 0;
     }
@@ -78,9 +66,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         if (this.size() == 0) throw new NoSuchElementException();
 
         int randIndex = StdRandom.uniform(this.currentIndex, this.currentIndex + this.size());
-        Item item = this.items[this.indices[randIndex]];
-        this.items[this.indices[randIndex]] = null;
-        this.swap(this.indices, this.currentIndex, randIndex);
+        Item item = this.items[randIndex % this.capacity];
+        this.items[randIndex % this.capacity] = this.items[this.currentIndex];
+        this.items[this.currentIndex] = null;
         this.currentIndex++;
         this.sz--;
 
@@ -98,14 +86,14 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         if (this.size() == 0) throw new NoSuchElementException();
 
         int randIndex = StdRandom.uniform(this.currentIndex, this.currentIndex + this.size());
-        Item item = this.items[this.indices[randIndex]];
+        Item item = this.items[randIndex % this.capacity];
         return item;
     }
 
     // return an independent iterator over items in random order
     public Iterator<Item> iterator() {
         Iterator<Item> iter = new RandomizedQueueIterator(this.currentIndex, this.size(),
-                                                          this.indices, this.items);
+                                                          this.items);
         return iter;
     }
 
@@ -115,14 +103,14 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         private final int sz;
         private final Item[] items;
 
-        public RandomizedQueueIterator(int currIndex, int sz, int[] indices, Item[] items) {
-            this.currIndex = currIndex;
-            this.sz = sz + currIndex;
+        public RandomizedQueueIterator(int currIndex, int sz, Item[] items) {
+            this.currIndex = 0;
+            this.sz = sz;
             this.items = items;
-            this.indices = new int[indices.length];
+            this.indices = new int[this.sz];
 
             for (int i = 0; i < indices.length; i++) {
-                this.indices[i] = indices[i];
+                this.indices[i] = currIndex + i;
             }
         }
 
@@ -161,16 +149,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             StdOut.println("sample() => " + randQueue.sample());
             StdOut.println("size() => " + randQueue.size());
         }
-
-        // for (int i : randQueue)
-        //     StdOut.println(i);
-        //
-        // RandomizedQueue<Integer> newRandQueue = new RandomizedQueue<>();
-        // for (int i = 0; i < 100; i++) {
-        //     newRandQueue.enqueue(i);
-        // }
-        // for (int i : newRandQueue)
-        //     StdOut.println(i);
     }
 
 }
