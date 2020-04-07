@@ -72,6 +72,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         this.currentIndex++;
         this.sz--;
 
+        if (this.capacity > 10 && this.size() < this.capacity / 4) {
+            this.resize(this.capacity / 2);
+        }
+
         return item;
     }
 
