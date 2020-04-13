@@ -52,8 +52,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     private void resize(int newSize) {
         Item[] newItems = (Item[]) new Object[newSize];
-        for (int i = this.currentIndex, j = 0; j < this.size(); i++, j++) {
-            newItems[j] = this.items[i % this.capacity];
+        for (int j = 0; j < this.size(); j++) {
+            newItems[j] = this.items[(j + this.currentIndex) % this.capacity];
         }
 
         this.items = newItems;
@@ -77,12 +77,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
 
         return item;
-    }
-
-    private void swap(int[] arr, int left, int right) {
-        int temp = arr[left];
-        arr[left] = arr[right];
-        arr[right] = temp;
     }
 
     // return a random item (but do not remove it)
