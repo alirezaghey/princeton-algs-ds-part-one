@@ -1,6 +1,6 @@
 /* *****************************************************************************
  *  Name: Alireza Ghey
- *  Date:
+ *  Date: 15-04-2020
  *  Description:
  **************************************************************************** */
 
@@ -15,15 +15,21 @@ public class Solver {
         private final Step prev;
         private final int currMoves;
         private final Board currBoard;
+        private int manh;
 
         public Step(Board b, Step prev, int currMoves) {
             this.prev = prev;
             this.currMoves = currMoves;
             this.currBoard = b;
+            this.manh = b.manhattan();
         }
 
         public Step previousStep() {
             return prev;
+        }
+
+        public int manhattan() {
+            return this.manh;
         }
 
         public int numOfMoves() {
@@ -35,8 +41,8 @@ public class Solver {
         }
 
         public int compareTo(Step other) {
-            int thisVal = board().manhattan() + numOfMoves();
-            int otherVal = other.board().manhattan() + other.numOfMoves();
+            int thisVal = manhattan() + numOfMoves();
+            int otherVal = other.manhattan() + other.numOfMoves();
             return thisVal - otherVal;
         }
     }
